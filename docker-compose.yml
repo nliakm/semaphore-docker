@@ -1,0 +1,36 @@
+version: '2.2'
+
+services:
+  mysql:
+    image: mysql:latest
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mysql_vol:/var/lib/mysql
+    ports:
+      - '3306:3306'
+  semaphore:
+    image: ansiblesemaphore/semaphore:latest
+    restart: always
+    environment:
+      - SEMAPHORE_DB_HOST=${SEMAPHORE_DB_HOST}
+      - SEMAPHORE_DB_USER=${SEMAPHORE_DB_USER}
+      - SEMAPHORE_DB_PASS=${SEMAPHORE_DB_PASS}
+      - SEMAPHORE_ADMIN_NAME=${SEMAPHORE_ADMIN_NAME}
+      - SEMAPHORE_ADMIN_PASSWORD=${SEMAPHORE_ADMIN_PASSWORD}
+    depends_on:
+      - mysql
+    links:
+      - mysql
+    ports:
+      - '3000:3000'
+    volumes:
+      - semaphore_vol:/opt/semaphore
+volumes:
+  mysql_vol:
+  semaphore_vol:
